@@ -1,0 +1,19 @@
+# Frontend
+biblioteca-web/node_modules/
+biblioteca-web/dist/
+biblioteca-web/build/
+
+# Java
+bibliotecaDesktop/target/
+bibliotecaDesktop/.idea/
+bibliotecaDesktop/*.iml
+bibliotecaDesktop/*.class
+bibliotecaDesktop/out/
+
+# Variables de entorno
+.env
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db

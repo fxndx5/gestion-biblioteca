@@ -1,0 +1,4 @@
+INDEX VERSION 1.134+C:\xampp\htdocs\BibliotecaDesktop\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+1184249259.index
+1944837873.index
