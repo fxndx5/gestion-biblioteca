@@ -64,7 +64,7 @@ Sistema de gestión bibliotecaria dividido en dos componentes principales que co
 
 ---
 
-## 📋 Requisitos Previos
+## Requisitos Previos
 
 ### Para la Aplicación Web
 - Servidor web (Apache/Nginx)
