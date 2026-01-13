@@ -9,9 +9,9 @@
     --accent-blue: #2980b9;
     --dark-blue: #004aad;
     --darker-blue: #2c3e50;
-    --success: #2ecc71;
+    --success: #266641;
     --warning: #f39c12;
-    --danger: #e74c3c;
+    --danger: #943a2f;
     --info: #3498db;
     
     --bg-light: #f8f9fa;
@@ -443,7 +443,137 @@ body {
     font-size: 0.9rem;
     margin-top: 5px;
 }
+/* ===== SEARCH BUSCAR-LIBRO ==== */
+.search-results {
+    position: relative;
+    margin-top: 10px;
+}
 
+.results-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+}
+
+.result-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    
+}
+
+.result-item:hover {
+    background: #f8f9fa;
+}
+
+.result-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f9f9f9;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-main {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.result-main strong {
+    color: #2c3e50;
+    font-size: 1.05em;
+}
+
+.result-secondary {
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.result-details {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.result-location {
+    font-size: 0.85em;
+    color: #95a5a6;
+    margin-top: 5px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #969a9b;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.badge.disponible {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge.no-disponible {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.error-message {
+    padding: 15px;
+    background: #f8d7da;
+    color: #721c24;
+    border-radius: 5px;
+}
+/* ==== SANCION INFO === */
+
+.btn-success {
+    background: #175525;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: scale(1.05);
+}
+
+.btn-warning {
+    background: #917a34;
+    color: #212529;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-warning:hover {
+    background: rgb(121, 92, 5);
+    transform: scale(1.05);
+}
+
+.btn-sm {
+    font-size: 0.875em;
+    padding: 6px 12px;
+}
 /* ===== TABLES ===== */
 .data-table,
 .category-table {

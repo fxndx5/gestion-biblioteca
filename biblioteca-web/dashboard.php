@@ -8,7 +8,7 @@ if (!isset($_SESSION['usuario_id'])) {
 require_once 'includes/conexion.php';
 
 function esAdministrador() {
-    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'admin';
+    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'administrador';
 }
 
 function esEmpleado() {
@@ -68,7 +68,7 @@ if (esAdministrador()) {
         }
     }
     
-    // Préstamos por estado
+    // prestamo por estado
     $sql_prestamos_estado = "SELECT 
         COUNT(*) as total_prestamos,
         SUM(CASE WHEN fecha_devolucion_real IS NOT NULL THEN 1 ELSE 0 END) as devueltos,
@@ -81,7 +81,7 @@ if (esAdministrador()) {
         $estadisticas_avanzadas['prestamos'] = $result->fetch_assoc();
     }
     
-    // Top 5 libros más prestados
+    // Top 5 libros mas prestados
     $sql_top_libros = "SELECT 
         l.titulo,
         l.autor,
@@ -100,7 +100,7 @@ if (esAdministrador()) {
         }
     }
     
-    // Empleados activos
+    // empleados activos
     $sql_empleados = "SELECT 
         COUNT(*) as total_empleados,
         SUM(CASE WHEN cargo = 'admin' THEN 1 ELSE 0 END) as admins,
@@ -153,7 +153,7 @@ if (!esAdministrador()) {
             <div class="user-info">
                 <p><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?> 
                     <span class="admin-badge">
-                        <i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
+                         <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
                     </span>
                 </p>
             </div>
@@ -162,37 +162,32 @@ if (!esAdministrador()) {
                 <ul>
                     <li class="active">
                         <a href="dashboard.php">
-                            <i class="fas fa-home"></i>
+                            
                             <span>Inicio</span>
                         </a>
                     </li>
                     <li>
                         <a href="modulos/libros.php">
-                            <i class="fas fa-book"></i>
                             <span>Libros</span>
                         </a>
                     </li>
                     <li>
                         <a href="modulos/prestamos.php">
-                            <i class="fas fa-exchange-alt"></i>
                             <span>Préstamos</span>
                         </a>
                     </li>
                     <li>
                         <a href="modulos/clientes.php">
-                            <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
                     </li>
                     <li>
                         <a href="modulos/categorias.php">
-                            <i class="fas fa-tags"></i>
                             <span>Categorías</span>
                         </a>
                     </li>
                     <li>
                         <a href="modulos/logout.php">
-                            <i class="fas fa-sign-out-alt"></i>
                             <span>Salir</span>
                         </a>
                     </li>
@@ -218,22 +213,20 @@ if (!esAdministrador()) {
             <!-- SECCIÓN EXCLUSIVA PARA ADMINISTRADORES -->
             <?php if (esAdministrador()): ?>
             <div class="admin-section">
-                <h2><i class="fas fa-chart-line"></i> Estadísticas Avanzadas (Solo Administrador)</h2>
+                <h2>Estadísticas Avanzadas (Solo Administrador)</h2>
                 
                 <!-- Estadísticas detalladas de clientes -->
                 <div class="stats-grid-advanced">
                     <div class="stat-card-advanced">
-                        <h4><i class="fas fa-users"></i> Clientes</h4>
+                        <h4></i> Clientes</h4>
                         <div class="stat-number-advanced">
                             <?php echo $clientes_stats['total_clientes'] ?? 0; ?>
                         </div>
                         <div class="stat-detail">
                             <span class="status-active">
-                                <i class="fas fa-check-circle"></i> 
                                 <?php echo $clientes_stats['clientes_activos'] ?? 0; ?> Activos
                             </span>
                             <span class="status-suspended">
-                                <i class="fas fa-ban"></i> 
                                 <?php echo $clientes_stats['clientes_sancionados'] ?? 0; ?> Sancionados
                             </span>
                         </div>
@@ -249,17 +242,15 @@ if (!esAdministrador()) {
                     
                     <!-- Estadísticas detalladas de libros -->
                     <div class="stat-card-advanced">
-                        <h4><i class="fas fa-book"></i> Libros</h4>
+                        <h4>Libros</h4>
                         <div class="stat-number-advanced">
                             <?php echo $libros_stats['total_ejemplares'] ?? 0; ?>
                         </div>
                         <div class="stat-detail">
                             <span class="status-available">
-                                <i class="fas fa-check"></i> 
                                 <?php echo $libros_stats['libros_disponibles'] ?? 0; ?> Disponibles
                             </span>
                             <span class="status-borrowed">
-                                <i class="fas fa-exchange-alt"></i> 
                                 <?php echo $libros_stats['libros_prestados'] ?? 0; ?> Prestados
                             </span>
                         </div>
@@ -275,7 +266,7 @@ if (!esAdministrador()) {
                     
                     <!-- Estadísticas de préstamos -->
                     <div class="stat-card-advanced">
-                        <h4><i class="fas fa-exchange-alt"></i> Préstamos</h4>
+                        <h4>Préstamos</h4>
                         <div class="stat-number-advanced">
                             <?php echo $estadisticas_avanzadas['prestamos']['total_prestamos'] ?? 0; ?>
                         </div>
@@ -292,17 +283,15 @@ if (!esAdministrador()) {
                     
                     <!-- Estadísticas de empleados -->
                     <div class="stat-card-advanced">
-                        <h4><i class="fas fa-user-tie"></i> Empleados</h4>
+                        <h4>Empleados</h4>
                         <div class="stat-number-advanced">
                             <?php echo $estadisticas_avanzadas['empleados']['total_empleados'] ?? 0; ?>
                         </div>
                         <div class="stat-detail">
                             <span class="status-active">
-                                <i class="fas fa-user-shield"></i> 
                                 <?php echo $estadisticas_avanzadas['empleados']['admins'] ?? 0; ?> Admin
                             </span>
                             <span class="status-available">
-                                <i class="fas fa-user"></i> 
                                 <?php echo $estadisticas_avanzadas['empleados']['empleados'] ?? 0; ?> Empleados
                             </span>
                         </div>
@@ -310,7 +299,7 @@ if (!esAdministrador()) {
                 </div>
                 
                 <!-- Tabla de libros por categoría -->
-                <h3><i class="fas fa-tags"></i> Libros por Categoría</h3>
+                <h3>Libros por Categoría</h3>
                 <table class="category-table">
                     <thead>
                         <tr>
@@ -360,7 +349,7 @@ if (!esAdministrador()) {
                 </table>
                 
                 <!-- Top 5 libros más prestados -->
-                <h3><i class="fas fa-trophy"></i> Top 5 Libros Más Prestados</h3>
+                <h3>Top 5 Libros Más Prestados</h3>
                 <?php if (!empty($top_libros)): ?>
                     <ul class="top-books-list">
                         <?php foreach ($top_libros as $index => $libro): ?>
@@ -403,18 +392,18 @@ if (!esAdministrador()) {
             <?php endif; ?>
 
             <div class="section prestamos-rapidos">
-                <h2><i class="fas fa-book-reader"></i> Gestión Rápida de Préstamos</h2>
+                <h2>Gestión Rápida de Préstamos</h2>
                 
                 <div class="prestamos-actions">
                     <button class="btn btn-primary" onclick="abrirModalNuevoPrestamo()">
-                        <i class="fas fa-plus-circle"></i> Nuevo Préstamo
+                        Nuevo Préstamo
                     </button>
                     <button class="btn btn-success" onclick="abrirModalDevolucion()">
-                        <i class="fas fa-undo"></i> Registrar Devolución
+                        Registrar Devolución
                     </button>
                 </div>
 
-                <h3 style="margin-top: 30px;"><i class="fas fa-calendar-day"></i> Préstamos Activos Pendientes de Devolución</h3>
+                <h3 style="margin-top: 30px;">Préstamos Activos Pendientes de Devolución</h3>
                 <div class="table-responsive">
                     <table class="data-table">
                         <thead>
@@ -469,11 +458,11 @@ if (!esAdministrador()) {
                                 <td>
                                     <?php if ($dias < 0): ?>
                                         <span class="badge badge-danger">
-                                            <i class="fas fa-exclamation-triangle"></i> <?php echo abs($dias); ?> días atrasado
+                                            <?php echo abs($dias); ?> días atrasado
                                         </span>
                                     <?php elseif ($dias <= 2): ?>
                                         <span class="badge badge-warning">
-                                            <i class="fas fa-clock"></i> <?php echo $dias; ?> días
+                                            <?php echo $dias; ?> días
                                         </span>
                                     <?php else: ?>
                                         <span class="badge badge-info"><?php echo $dias; ?> días</span>
@@ -487,8 +476,7 @@ if (!esAdministrador()) {
                                 <td>
                                     <button class="btn-action btn-success-sm" 
                                             onclick="devolverLibro(<?php echo $prestamo['id']; ?>, '<?php echo htmlspecialchars($prestamo['titulo']); ?>', '<?php echo htmlspecialchars($prestamo['nombre']); ?>')"
-                                            title="Registrar Devolución">
-                                        <i class="fas fa-check-circle"></i>
+                                            title="Registrar Devolución">x
                                     </button>
                                 </td>
                             </tr>
@@ -499,7 +487,6 @@ if (!esAdministrador()) {
                             <tr>
                                 <td colspan="9" class="text-center">
                                     <div class="empty-state">
-                                        <i class="fas fa-inbox"></i>
                                         <p>No hay préstamos activos</p>
                                     </div>
                                 </td>
@@ -514,7 +501,7 @@ if (!esAdministrador()) {
             <div id="modalNuevoPrestamo" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-book-reader"></i> Registrar Nuevo Préstamo</h3>
+                        <h3> Registrar Nuevo Préstamo</h3>
                         <button class="btn-close" onclick="cerrarModal('modalNuevoPrestamo')">&times;</button>
                     </div>
                     
@@ -522,7 +509,7 @@ if (!esAdministrador()) {
                         <div class="modal-body">
                             <!-- Paso 1: Buscar Cliente -->
                             <div class="form-section">
-                                <h4><i class="fas fa-user-check"></i> 1. Buscar Cliente</h4>
+                                <h4>1. Buscar Cliente</h4>
                                 <div class="form-group">
                                     <label for="buscarCliente">DNI o Nombre del Cliente:</label>
                                     <input type="text" 
@@ -537,7 +524,7 @@ if (!esAdministrador()) {
 
                             <!-- Paso 2: Buscar Libro -->
                             <div class="form-section">
-                                <h4><i class="fas fa-book"></i> 2. Buscar Libro</h4>
+                                <h4>2. Buscar Libro</h4>
                                 <div class="form-group">
                                     <label for="buscarLibro">ID, Título o Autor del Libro:</label>
                                     <input type="text" 
@@ -552,13 +539,14 @@ if (!esAdministrador()) {
 
                             <!-- Paso 3: Detalles del Préstamo -->
                             <div class="form-section">
-                                <h4><i class="fas fa-calendar-alt"></i> 3. Detalles del Préstamo</h4>
+                                <h4>3. Detalles del Préstamo</h4>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="fechaDevolucion">Fecha de Devolución Estimada:</label>
                                         <input type="date" 
                                             id="fechaDevolucion" 
                                             name="fecha_devolucion_estimada"
+                                            min="<?php echo date('Y-m-d'); ?>"
                                             required>
                                     </div>
                                 </div>
@@ -579,7 +567,7 @@ if (!esAdministrador()) {
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check"></i> Registrar Préstamo
+                                Registrar Préstamo
                             </button>
                         </div>
                     </form>
@@ -590,14 +578,14 @@ if (!esAdministrador()) {
             <div id="modalDevolucion" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-undo"></i> Registrar Devolución</h3>
+                        <h3>Registrar Devolución</h3>
                         <button class="btn-close" onclick="cerrarModal('modalDevolucion')">&times;</button>
                     </div>
                     
                     <form id="formDevolucion" onsubmit="event.preventDefault(); registrarDevolucion();">
                         <div class="modal-body">
                             <div class="form-section">
-                                <h4><i class="fas fa-search"></i> Buscar Préstamo Activo</h4>
+                                <h4>Buscar Préstamo Activo</h4>
                                 <div class="form-group">
                                     <label for="buscarPrestamo">DNI del Cliente o ID del Préstamo:</label>
                                     <input type="text" 
@@ -626,7 +614,99 @@ if (!esAdministrador()) {
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check-circle"></i> Confirmar Devolución
+                                Confirmar Devolución
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- ===== MODAL ELIMINAR SANCIÓN ===== -->
+            <div id="modalEliminarSancion" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-user-check"></i> Eliminar Sanción</h3>
+                        <button class="btn-close" onclick="cerrarModal('modalEliminarSancion')">&times;</button>
+                    </div>
+                    
+                    <form id="formEliminarSancion" onsubmit="event.preventDefault(); eliminarSancion();">
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Advertencia:</strong> Esta acción reactivará al cliente, permitiéndole realizar préstamos nuevamente.
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Buscar Cliente Sancionado</h4>
+                                <div class="form-group">
+                                    <label for="buscarSancion">DNI o Nombre del Cliente:</label>
+                                    <input type="text" 
+                                        id="buscarSancion" 
+                                        placeholder="Ej: 12345678 o Juan Pérez"
+                                        oninput="buscarSancionActiva(this.value)"
+                                        required>
+                                </div>
+                                <div id="resultadosSancion" class="search-results"></div>
+                                <input type="hidden" id="sancionSeleccionada" name="id_cliente" required>
+                            </div>
+
+                            <div id="infoSancion" class="sancion-info" style="display: none;">
+                                <div class="info-card">
+                                    <h4><i class="fas fa-info-circle"></i> Información del Cliente</h4>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Cliente:</span>
+                                            <span id="infoCliente" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">DNI:</span>
+                                            <span id="infoDNI" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Email:</span>
+                                            <span id="infoEmail" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Teléfono:</span>
+                                            <span id="infoTelefono" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Fecha Registro:</span>
+                                            <span id="infoFechaRegistro" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Fin de Sanción:</span>
+                                            <span id="infoFechaFin" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Estado Sanción:</span>
+                                            <span id="infoEstado" class="info-value"></span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Días Restantes:</span>
+                                            <span id="infoDiasRestantes" class="info-value"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="razonEliminacion">Motivo de Reactivación:</label>
+                                <textarea id="razonEliminacion" 
+                                        name="razon_eliminacion" 
+                                        rows="3"
+                                        placeholder="Ej: Sanción completada, error en el registro, cliente ha pagado multa, etc."
+                                        required></textarea>
+                            </div>
+
+                            <div id="alertaEliminarSancion" class="alert" style="display: none;"></div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalEliminarSliminarSancion')">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Reactivar Cliente
                             </button>
                         </div>
                     </form>
@@ -916,8 +996,8 @@ if (!esAdministrador()) {
                     <div class="search-result-item" onclick="seleccionarCliente(${cliente.id}, '${cliente.nombre}', '${cliente.dni}')">
                         <div class="result-info">
                             <strong>${cliente.nombre}</strong>
-                            <small><i class="fas fa-id-card"></i> DNI: ${cliente.dni}</small>
-                            ${cliente.sancionado == 1 ? '<br><span class="badge badge-danger"><i class="fas fa-ban"></i> Sancionado</span>' : ''}
+                            <small>DNI: ${cliente.dni}</small>
+                            ${cliente.sancionado == 0 ? '<br><span class="badge badge-danger">Sancionado</span>' : ''}
                         </div>
                     </div>
                 `).join('');
@@ -964,8 +1044,8 @@ if (!esAdministrador()) {
                         onclick="${libro.disponibles > 0 ? `seleccionarLibro(${libro.id}, '${libro.titulo}', '${libro.autor}')` : ''}">
                         <div class="result-info">
                             <strong>${libro.titulo}</strong>
-                            <small><i class="fas fa-user"></i> ${libro.autor}</small><br>
-                            <small><i class="fas fa-barcode"></i> ISBN: ${libro.isbn}</small>
+                            <small>${libro.autor}</small><br>
+                            <small>ISBN: ${libro.isbn}</small>
                         </div>
                         <span class="result-badge ${libro.disponibles > 0 ? 'disponible' : 'no-disponible'}">
                             ${libro.disponibles} disponibles
@@ -1014,8 +1094,8 @@ if (!esAdministrador()) {
                     <div class="search-result-item" onclick="seleccionarPrestamo(${prestamo.id}, '${prestamo.titulo}', '${prestamo.cliente}')">
                         <div class="result-info">
                             <strong>ID: ${prestamo.id} - ${prestamo.titulo}</strong>
-                            <small><i class="fas fa-user"></i> Cliente: ${prestamo.cliente} (${prestamo.dni})</small><br>
-                            <small><i class="fas fa-calendar"></i> Devolución estimada: ${prestamo.fecha_devolucion_estimada}</small>
+                            <small>Cliente: ${prestamo.cliente} (${prestamo.dni})</small><br>
+                            <small>Devolución estimada: ${prestamo.fecha_devolucion_estimada}</small>
                         </div>
                         <span class="badge ${prestamo.dias_restantes < 0 ? 'badge-danger' : 'badge-info'}">
                             ${prestamo.dias_restantes < 0 ? `${Math.abs(prestamo.dias_restantes)} días atrasado` : `${prestamo.dias_restantes} días`}
@@ -1122,7 +1202,7 @@ if (!esAdministrador()) {
 
             <!-- Préstamos recientes (visibles para todos) -->
             <div class="section">
-                <h2><i class="fas fa-history"></i> Préstamos Recientes</h2>
+                <h2>Préstamos Recientes</h2>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -1200,7 +1280,7 @@ if (!esAdministrador()) {
         <?php if (esAdministrador()): ?>
         setTimeout(() => {
             location.reload();
-        }, 120000); // 120000 ms = 2 minutos
+        }, 120000);
         <?php endif; ?>
     </script>
     

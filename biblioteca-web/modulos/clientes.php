@@ -9,7 +9,7 @@ require_once '../includes/conexion.php';
 
 // Función para verificar permisos
 function esAdministrador() {
-    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'admin';
+    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'administrador';
 }
 
 function esEmpleado() {
@@ -125,7 +125,7 @@ $result_clientes = $conn->query($sql_clientes);
             <div class="user-info">
                 <p><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?> 
                     <span class="admin-badge">
-                        <i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
+                        <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
                     </span>
                 </p>
             </div>
@@ -134,37 +134,31 @@ $result_clientes = $conn->query($sql_clientes);
                 <ul>
                     <li>
                         <a href="../dashboard.php">
-                            <i class="fas fa-home"></i>
                             <span>Inicio</span>
                         </a>
                     </li>
                     <li>
                         <a href="libros.php">
-                            <i class="fas fa-book"></i>
                             <span>Libros</span>
                         </a>
                     </li>
                     <li>
                         <a href="prestamos.php">
-                            <i class="fas fa-exchange-alt"></i>
                             <span>Préstamos</span>
                         </a>
                     </li>
                     <li class="active">
                         <a href="clientes.php">
-                            <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
                     </li>
                     <li>
                         <a href="categorias.php">
-                            <i class="fas fa-tags"></i>
                             <span>Categorías</span>
                         </a>
                     </li>
                     <li>
                         <a href="logout.php">
-                            <i class="fas fa-sign-out-alt"></i>
                             <span>Salir</span>
                         </a>
                     </li>
@@ -174,33 +168,33 @@ $result_clientes = $conn->query($sql_clientes);
 
         <div class="main-content">
             <header class="dashboard-header">
-                <h1><i class="fas fa-users"></i> Gestión de Clientes</h1>
+                <h1>Gestión de Clientes</h1>
                 <div class="header-actions">
                     <?php if (esAdministrador() || esEmpleado()): ?>
                     <button id="btnNuevoCliente" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Nuevo Cliente
+                        Nuevo Cliente
                     </button>
                     <?php endif; ?>
                     <button class="btn btn-secondary" onclick="window.print()">
-                        <i class="fas fa-print"></i> Imprimir
+                        Imprimir
                     </button>
                 </div>
             </header>
 
             <?php if (isset($_SESSION['success_message'])): ?>
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
+                    <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
                 </div>
             <?php endif; ?>
             
             <?php if (isset($_SESSION['error_message'])): ?>
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
+                    <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
                 </div>
             <?php endif; ?>
 
             <div class="section">
-                <h2><i class="fas fa-list"></i> Listado de Clientes</h2>
+                <h2><i class="fas fa-list"></i>Listado de Clientes</h2>
                 <div class="table-responsive">
                     <table class="data-table">
                         <thead>
@@ -238,14 +232,14 @@ $result_clientes = $conn->query($sql_clientes);
                                     <td>
                                         <div class="contact-info">
                                             <?php if ($cliente['email']): ?>
-                                                <div><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($cliente['email']); ?></div>
+                                                <div><?php echo htmlspecialchars($cliente['email']); ?></div>
                                             <?php endif; ?>
                                             <?php if ($cliente['telefono']): ?>
-                                                <div><i class="fas fa-phone"></i> <?php echo htmlspecialchars($cliente['telefono']); ?></div>
+                                                <div><?php echo htmlspecialchars($cliente['telefono']); ?></div>
                                             <?php endif; ?>
                                             <?php if ($prestamos_activos > 0): ?>
                                                 <div class="text-warning">
-                                                    <i class="fas fa-book"></i> <?php echo $prestamos_activos; ?> préstamo(s) activo(s)
+                                                    <?php echo $prestamos_activos; ?> préstamo(s) activo(s)
                                                 </div>
                                             <?php endif; ?>
                                         </div>
@@ -298,6 +292,29 @@ $result_clientes = $conn->query($sql_clientes);
                                     </td>
                                 </tr>
                             <?php endif; ?>
+                            <td class="acciones">
+                                <?php if ($_SESSION['usuario_cargo'] === 'admin'): ?>
+                                    <?php if ($cliente['sancionado'] == 0): ?>
+
+                                        <button class="btn btn-success btn-sm" 
+                                                onclick="eliminarSancion(<?= $cliente['id'] ?>, '<?= addslashes($cliente['nombre']) ?>')"
+                                                title="Eliminar sanción">
+                                            <i class="fas fa-unlock"></i> Quitar Sanción
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-warning btn-sm" 
+                                                onclick="abrirModalSancion(<?= $cliente['id'] ?>, '<?= addslashes($cliente['nombre']) ?>')"
+                                                title="Aplicar sanción">
+                                            <i class="fas fa-lock"></i> Sancionar
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                                
+                                <button class="btn btn-primary btn-sm" onclick="editarCliente(<?= $cliente['id'] ?>)">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </td>
+
                         </tbody>
                     </table>
                 </div>
@@ -542,7 +559,7 @@ $result_clientes = $conn->query($sql_clientes);
         }
         
         .close:hover {
-            color: #e74c3c;
+            color: #752118;
             transform: scale(1.1);
         }
         

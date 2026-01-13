@@ -125,7 +125,7 @@ $result_categorias = $conn->query($sql_categorias);
             <div class="user-info">
                 <p><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?> 
                     <span class="admin-badge">
-                        <i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
+                        <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
                     </span>
                 </p>
             </div>
@@ -134,37 +134,31 @@ $result_categorias = $conn->query($sql_categorias);
                 <ul>
                     <li>
                         <a href="../dashboard.php">
-                            <i class="fas fa-home"></i>
                             <span>Inicio</span>
                         </a>
                     </li>
                     <li>
                         <a href="libros.php">
-                            <i class="fas fa-book"></i>
                             <span>Libros</span>
                         </a>
                     </li>
                     <li>
                         <a href="prestamos.php">
-                            <i class="fas fa-exchange-alt"></i>
                             <span>Préstamos</span>
                         </a>
                     </li>
                     <li>
                         <a href="clientes.php">
-                            <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
                     </li>
                     <li class="active">
                         <a href="categorias.php">
-                            <i class="fas fa-tags"></i>
                             <span>Categorías</span>
                         </a>
                     </li>
                     <li>
                         <a href="logout.php">
-                            <i class="fas fa-sign-out-alt"></i>
                             <span>Salir</span>
                         </a>
                     </li>
@@ -174,7 +168,7 @@ $result_categorias = $conn->query($sql_categorias);
 
         <div class="main-content">
             <header class="dashboard-header">
-                <h1><i class="fas fa-tags"></i> Gestión de Categorías</h1>
+                <h1>Gestión de Categorías</h1>
                 <div class="header-actions">
                     <?php if (esAdministrador()): ?>
                     <button id="btnNuevaCategoria" class="btn btn-primary">

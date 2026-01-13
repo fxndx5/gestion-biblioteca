@@ -145,7 +145,7 @@ $result_clientes = $conn->query($sql_clientes);
             <div class="user-info">
                 <p><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?> 
                     <span class="admin-badge">
-                        <i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
+                        <?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?>
                     </span>
                 </p>
             </div>
@@ -154,37 +154,31 @@ $result_clientes = $conn->query($sql_clientes);
                 <ul>
                     <li>
                         <a href="../dashboard.php">
-                            <i class="fas fa-home"></i>
                             <span>Inicio</span>
                         </a>
                     </li>
                     <li>
                         <a href="libros.php">
-                            <i class="fas fa-book"></i>
                             <span>Libros</span>
                         </a>
                     </li>
                     <li class="active">
                         <a href="prestamos.php">
-                            <i class="fas fa-exchange-alt"></i>
                             <span>Préstamos</span>
                         </a>
                     </li>
                     <li>
                         <a href="clientes.php">
-                            <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
                     </li>
                     <li>
                         <a href="categorias.php">
-                            <i class="fas fa-tags"></i>
                             <span>Categorías</span>
                         </a>
                     </li>
                     <li>
                         <a href="logout.php">
-                            <i class="fas fa-sign-out-alt"></i>
                             <span>Salir</span>
                         </a>
                     </li>
@@ -194,7 +188,7 @@ $result_clientes = $conn->query($sql_clientes);
 
         <div class="main-content">
             <header class="dashboard-header">
-                <h1><i class="fas fa-exchange-alt"></i> Gestión de Préstamos</h1>
+                <h1>Gestión de Préstamos</h1>
                 <div class="header-actions">
                     <?php if (esAdministrador() || $_SESSION['usuario_cargo'] === 'empleado'): ?>
                     <button id="btnNuevoPrestamo" class="btn btn-primary">
@@ -241,22 +235,22 @@ $result_clientes = $conn->query($sql_clientes);
                 <div class="stat-card">
                     <h3>Préstamos Activos</h3>
                     <p class="stat-number"><?php echo $activos; ?></p>
-                    <p><i class="fas fa-exchange-alt"></i> En circulación</p>
+                    <p>En circulación</p>
                 </div>
                 <div class="stat-card">
                     <h3>Préstamos Atrasados</h3>
                     <p class="stat-number"><?php echo $atrasados; ?></p>
-                    <p><i class="fas fa-exclamation-triangle"></i> Pendientes</p>
+                    <p>Pendientes</p>
                 </div>
                 <div class="stat-card">
                     <h3>Préstamos Hoy</h3>
                     <p class="stat-number"><?php echo $hoy; ?></p>
-                    <p><i class="fas fa-calendar-day"></i> Realizados hoy</p>
+                    <p>Realizados hoy</p>
                 </div>
                 <div class="stat-card">
                     <h3>Préstamos Este Mes</h3>
                     <p class="stat-number"><?php echo $mes; ?></p>
-                    <p><i class="fas fa-calendar-alt"></i> Total del mes</p>
+                    <p>Total del mes</p>
                 </div>
             </div>
 
