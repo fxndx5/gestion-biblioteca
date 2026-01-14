@@ -2,6 +2,7 @@ package com.biblioteca.view;
 
 import com.biblioteca.controller.ClienteController;
 import com.biblioteca.model.Cliente;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
@@ -51,13 +52,11 @@ public class ClientesPanel extends JPanel {
         JButton btnBuscar = new JButton("Buscar");
         btnBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         btnBuscar.setBackground(COLOR_PRIMARIO);
-        btnBuscar.setForeground(Color.WHITE);
+        btnBuscar.setForeground(Color.BLACK);
         btnBuscar.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARIO.darker(), 1));
         btnBuscar.setFocusPainted(false);
 
-        searchPanel.add(new JLabel("Buscar cliente:"));
-        searchPanel.add(txtBuscar);
-        searchPanel.add(btnBuscar);
+
 
         topPanel.add(lblTitulo, BorderLayout.WEST);
         topPanel.add(searchPanel, BorderLayout.EAST);
@@ -68,16 +67,16 @@ public class ClientesPanel extends JPanel {
         panelBotones.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
         JButton btnNuevo = crearBotonConIcono("Nuevo Cliente", COLOR_PRIMARIO);
-        JButton btnEditar = crearBotonConIcono("Editar", new Color(255, 152, 0));
-        JButton btnEliminar = crearBotonConIcono("Eliminar", new Color(244, 67, 54));
-        JButton btnSancionar = crearBotonConIcono("Sancionar/Quitar", new Color(156, 39, 176));
-        JButton btnActualizar = crearBotonConIcono("Actualizar", new Color(56, 142, 60));
+        JButton btnEditar = crearBotonConIcono("Editar", COLOR_PRIMARIO);
+        JButton btnEliminar = crearBotonConIcono("Eliminar",COLOR_PRIMARIO);
+        JButton btnSancionar = crearBotonConIcono("Sancionar/Quitar",COLOR_PRIMARIO);
+
 
         panelBotones.add(btnNuevo);
         panelBotones.add(btnEditar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnSancionar);
-        panelBotones.add(btnActualizar);
+
 
         // Tabla de clientes con estilo mejorado
         String[] columnas = {"ID", "DNI", "Nombre", "Email", "Teléfono", "Dirección", "Registro", "Sancionado"};
@@ -100,7 +99,7 @@ public class ClientesPanel extends JPanel {
         tablaClientes.setRowHeight(30);
         tablaClientes.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tablaClientes.getTableHeader().setBackground(COLOR_PRIMARIO);
-        tablaClientes.getTableHeader().setForeground(Color.WHITE);
+        tablaClientes.getTableHeader().setForeground(Color.BLACK);
         tablaClientes.getTableHeader().setBorder(BorderFactory.createEmptyBorder());
         tablaClientes.setShowGrid(true);
         tablaClientes.setGridColor(new Color(240, 240, 240));
@@ -172,7 +171,7 @@ public class ClientesPanel extends JPanel {
         btnEditar.addActionListener(e -> editarClienteSeleccionado());
         btnEliminar.addActionListener(e -> eliminarClienteSeleccionado());
         btnSancionar.addActionListener(e -> cambiarSancionCliente());
-        btnActualizar.addActionListener(e -> cargarClientes());
+
 
         add(topPanel, BorderLayout.NORTH);
         add(panelBotones, BorderLayout.CENTER);
@@ -183,7 +182,7 @@ public class ClientesPanel extends JPanel {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         boton.setBackground(color);
-        boton.setForeground(Color.WHITE);
+        boton.setForeground(Color.BLACK);
         boton.setBorder(BorderFactory.createLineBorder(color.darker(), 1));
         boton.setFocusPainted(false);
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -282,14 +281,14 @@ public class ClientesPanel extends JPanel {
         JButton btnGuardar = new JButton("Guardar");
         btnGuardar.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnGuardar.setBackground(COLOR_PRIMARIO);
-        btnGuardar.setForeground(Color.WHITE);
+        btnGuardar.setForeground(Color.BLACK);
         btnGuardar.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARIO.darker(), 1));
         btnGuardar.setFocusPainted(false);
 
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnCancelar.setBackground(new Color(100, 100, 100));
-        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setForeground(Color.BLACK);
         btnCancelar.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80), 1));
         btnCancelar.setFocusPainted(false);
 

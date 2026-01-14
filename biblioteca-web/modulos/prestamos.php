@@ -7,13 +7,12 @@ if (!isset($_SESSION['usuario_id'])) {
 
 require_once '../includes/conexion.php';
 
-// Función para verificar permisos
 function esAdministrador() {
     return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'admin';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_prestamo'])) {
-    // Solo empleados y admin pueden crear préstamos
+
     if (!esAdministrador() && $_SESSION['usuario_cargo'] !== 'empleado') {
         $_SESSION['error_message'] = 'No tiene permisos para crear préstamos';
         header('Location: prestamos.php');
@@ -26,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_prestamo'])) {
     $observaciones = $_POST['observaciones'];
     $id_empleado = $_SESSION['usuario_id'];
 
-    // Verificar disponibilidad del libro
+    //disponibilidad del libro
     $sql_check = "SELECT disponibles FROM libros WHERE id = ?";
     $stmt_check = $conn->prepare($sql_check);
     $stmt_check->bind_param("i", $id_libro);
@@ -47,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_prestamo'])) {
     $stmt->bind_param("iiiss", $id_libro, $id_cliente, $id_empleado, $fecha_devolucion_estimada, $observaciones);
     
     if ($stmt->execute()) {
-        // Actualizar disponibilidad del libro
+        //actualizar disponibilidad del libro
         $sql_update = "UPDATE libros SET disponibles = disponibles - 1 WHERE id = ?";
         $stmt_update = $conn->prepare($sql_update);
         $stmt_update->bind_param("i", $id_libro);
@@ -88,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['devolver_prestamo']))
     $stmt->bind_param("i", $id_prestamo);
     
     if ($stmt->execute()) {
-        // Devolver el libro al inventario
         $sql_update = "UPDATE libros SET disponibles = disponibles + 1 WHERE id = ?";
         $stmt_update = $conn->prepare($sql_update);
         $stmt_update->bind_param("i", $prestamo['id_libro']);

@@ -29,7 +29,6 @@ if (isset($_SESSION['usuario_id'])) {
         .login-box {
             padding: 40px;
             border-radius: 15px;
-            border-top: 5px solid #0056b3;
         }
     </style>
 </head>

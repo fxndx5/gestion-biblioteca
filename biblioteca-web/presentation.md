@@ -2,18 +2,16 @@
 marp: true
 theme: uncover
 class: invert
-backgroundColor: #0f0f1b
+backgroundColor: #10101b
 color: #eee
 ---
-
-
 ![bg opacity:0.2](https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920)
 
 # Sistema de Gestión de Biblioteca
 
-**Gestión para Biblioteca Pública**
+**Solución Integral para Bibliotecas Públicas**
 
-Fernanda González Alvarenga
+Fernanda González
 Acceso a Datos
 
 ---
@@ -27,7 +25,6 @@ Acceso a Datos
 **Base de Datos MySQL** - Persistencia unificada
 
 ---
-
 
 ## Arquitectura del Sistema
 
@@ -274,7 +271,7 @@ graph LR
 ### Stack Backend
 - **PHP 8.2**: Lógica de negocio
 - **MySQL 8.0**: Base de datos relacional
-- **PDO/MySQLi**: Acceso a datos seguro
+- **DTO's/MySQLi**: Acceso a datos seguro
 
 ---
 
@@ -502,7 +499,7 @@ try {
 - **Maven**: Gestión de dependencias
 
 ### Función Exclusiva
-**CRUD completo de empleados** (solo admins)
+**CRUD completo de empleados** (solo admin)
 
 ---
 
@@ -533,7 +530,6 @@ try (Connection conn = DatabaseConnection.getConnection()) {
 
 ---
 
-
 ## Funcionalidades Clave
 
 ### Gestión de Préstamos
@@ -549,7 +545,7 @@ try (Connection conn = DatabaseConnection.getConnection()) {
 
 ---
 
-## Funcionalidades Clave 
+## Funcionalidades Clave (2)
 
 ### Gestión de Libros
 - CRUD de libros y categorías
@@ -644,7 +640,6 @@ $password = 'tu_password';
 
 ---
 
-## Pasos de Instalación
 
 ### 3. Configurar Servidor Web
 
@@ -666,6 +661,48 @@ http://localhost/biblioteca-web/login.php
 Usuario: admin
 Password: admin123
 ```
+
+---
+
+## Ventajas Competitivas
+
+### Vs. Sistemas Tradicionales
+
+| Característica | Sistema Tradicional | Nuestro Sistema |
+|----------------|-------------------|-----------------|
+| Interfaz | Anticuada | Moderna y responsive |
+| Búsqueda | Manual/Lenta | Autocompletado rápido |
+| Transacciones | Propensas a error | Atomicidad garantizada |
+| Seguridad | Básica | Multi-capa |
+| Escalabilidad | Limitada | Arquitectura modular |
+
+---
+
+## Casos de Uso Reales
+
+### Biblioteca Universitaria
+- **10,000+ libros** en catálogo
+- **5,000+ estudiantes** registrados
+- **500+ préstamos/día** en época de exámenes
+- **Tiempo de préstamo**: menos de 30 segundos
+
+### Biblioteca Municipal
+- Gestión de **3 sucursales**
+- Atención a **todas las edades**
+- **Catálogo compartido** entre sedes
+
+---
+
+## Soporte y Mantenimiento
+
+### Servicios Incluidos
+
+- **Actualizaciones de seguridad** mensuales
+- **Backups automáticos** diarios
+- **Monitoreo 24/7** de servidor
+- **Documentación completa** en español
+- **Capacitación** al equipo (2 sesiones)
+- **Migración de datos** desde sistema anterior
 
 ---
 

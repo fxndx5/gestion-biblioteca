@@ -36,7 +36,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $stmt->close();
     $conn->close();
-} else {
-    echo json_encode(['success' => false, 'message' => 'Método no permitido']);
 }
 ?>

@@ -19,13 +19,11 @@ $fecha_devolucion_estimada = $_POST['fecha_devolucion_estimada'] ?? null;
 $observaciones = $_POST['observaciones'] ?? '';
 $id_empleado = $_SESSION['usuario_id'];
 
-// Validar datos obligatorios
 if (!$id_cliente || !$id_libro || !$fecha_devolucion_estimada) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos obligatorios']);
     exit();
 }
 
-// Verificar que el cliente existe y no está sancionado
 $sql_cliente = "SELECT id, nombre, sancionado, fecha_fin_sancion FROM clientes WHERE id = ?";
 $stmt = $conn->prepare($sql_cliente);
 $stmt->bind_param("i", $id_cliente);
@@ -46,8 +44,6 @@ if ($cliente['sancionado'] == 0) {
     ]);
     exit();
 }
-
-// Verificar que el libro existe y tiene ejemplares disponibles
 $sql_libro = "SELECT id, titulo, disponibles FROM libros WHERE id = ?";
 $stmt = $conn->prepare($sql_libro);
 $stmt->bind_param("i", $id_libro);
@@ -65,38 +61,43 @@ if ($libro['disponibles'] <= 0) {
     exit();
 }
 
-// Iniciar transacción
 $conn->begin_transaction();
 
 try {
-    // Registrar el préstamo
     $sql_prestamo = "INSERT INTO prestamos (id_libro, id_cliente, id_empleado, fecha_prestamo, fecha_devolucion_estimada, estado, observaciones) 
-                     VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, 'activo', ?)";
+                     VALUES (?, ?, ?, NOW(), ?, 'activo', ?)";
     
     $stmt = $conn->prepare($sql_prestamo);
+    
+    if (!$stmt) {
+        throw new Exception('Error en prepare: ' . $conn->error);
+    }
+    
     $stmt->bind_param("iiiss", $id_libro, $id_cliente, $id_empleado, $fecha_devolucion_estimada, $observaciones);
     
     if (!$stmt->execute()) {
-        throw new Exception('Error al registrar el préstamo');
+        throw new Exception('Error al ejecutar INSERT: ' . $stmt->error);
     }
     
     $id_prestamo_nuevo = $conn->insert_id;
     
-    // Disminuir disponibilidad del libro
+    if ($id_prestamo_nuevo == 0) {
+        throw new Exception('INSERT ejecutado pero insert_id es 0');
+    }
     $sql_update_libro = "UPDATE libros SET disponibles = disponibles - 1 WHERE id = ?";
     $stmt = $conn->prepare($sql_update_libro);
     $stmt->bind_param("i", $id_libro);
     
     if (!$stmt->execute()) {
-        throw new Exception('Error al actualizar disponibilidad del libro');
+        throw new Exception('Error al actualizar libro: ' . $stmt->error);
     }
     
-    // Confirmar transacción
+   
     $conn->commit();
     
     echo json_encode([
         'success' => true, 
-        'message' => '✓ Préstamo registrado correctamente',
+        'message' => "✓ Préstamo #$id_prestamo_nuevo registrado correctamente",
         'id_prestamo' => $id_prestamo_nuevo,
         'libro' => $libro['titulo'],
         'cliente' => $cliente['nombre'],

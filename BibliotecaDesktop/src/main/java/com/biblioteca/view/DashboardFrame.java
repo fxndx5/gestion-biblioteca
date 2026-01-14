@@ -3,6 +3,7 @@ package com.biblioteca.view;
 import com.biblioteca.controller.LibroController;
 import com.biblioteca.controller.PrestamoController;
 import com.biblioteca.controller.ClienteController;
+import com.biblioteca.controller.EmpleadoController;
 import com.biblioteca.model.Libro;
 import com.biblioteca.model.Prestamo;
 import com.biblioteca.model.Cliente;
@@ -17,6 +18,7 @@ public class DashboardFrame extends JFrame {
     private JPanel panelLibros;
     private JPanel panelPrestamos;
     private JPanel panelClientes;
+    private JPanel panelEmpleados;
     private JPanel panelCategorias;
 
     private JTable tablaLibros;
@@ -27,10 +29,11 @@ public class DashboardFrame extends JFrame {
     private LibroController libroController;
     private PrestamoController prestamoController;
     private ClienteController clienteController;
+    private EmpleadoController empleadoController;
 
     // Colores principales
-    private final Color COLOR_PRIMARIO = new Color(25, 118, 210);
-    private final Color COLOR_SECUNDARIO = new Color(13, 71, 161);
+    private final Color COLOR_PRIMARIO = new Color(15, 78, 141);
+    private final Color COLOR_SECUNDARIO = new Color(10, 37, 78);
     private final Color COLOR_FONDO = new Color(248, 249, 250);
     private final Color COLOR_TARJETA = Color.WHITE;
     private final Color COLOR_BORDE = new Color(230, 230, 230);
@@ -53,6 +56,7 @@ public class DashboardFrame extends JFrame {
         libroController = new LibroController();
         prestamoController = new PrestamoController();
         clienteController = new ClienteController();
+        empleadoController = new EmpleadoController();
 
         initComponents();
         cargarDatosInicio();
@@ -61,32 +65,6 @@ public class DashboardFrame extends JFrame {
     private void initComponents() {
         // Configurar fondo principal
         getContentPane().setBackground(COLOR_FONDO);
-
-        // Crear barra de menú con estilo mejorado
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(COLOR_PRIMARIO);
-        menuBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-        JMenu menuArchivo = new JMenu("Archivo");
-        menuArchivo.setForeground(Color.WHITE);
-        menuArchivo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-        JMenuItem itemSalir = new JMenuItem("Salir");
-        itemSalir.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        itemSalir.addActionListener(e -> System.exit(0));
-        menuArchivo.add(itemSalir);
-
-        JMenu menuAyuda = new JMenu("Ayuda");
-        menuAyuda.setForeground(Color.WHITE);
-        menuAyuda.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-        JMenuItem itemAcerca = new JMenuItem("Acerca de");
-        itemAcerca.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        menuAyuda.add(itemAcerca);
-
-        menuBar.add(menuArchivo);
-        menuBar.add(menuAyuda);
-
         // Panel de usuario
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         userPanel.setOpaque(false);
@@ -95,13 +73,10 @@ public class DashboardFrame extends JFrame {
         lblUsuario.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblUsuario.setForeground(Color.WHITE);
 
+
         userPanel.add(lblUsuario);
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(userPanel);
 
-        setJMenuBar(menuBar);
-
-        // Panel de encabezado
+        // Panel de encabezado con estadísticas reales
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(COLOR_PRIMARIO);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -121,14 +96,21 @@ public class DashboardFrame extends JFrame {
 
         headerPanel.add(titlePanel, BorderLayout.WEST);
 
-        // Panel de estadísticas rápidas
-        JPanel statsPanel = new JPanel(new GridLayout(1, 4, 10, 0));
+        // Panel de estadísticas rápidas con datos REALES de la base de datos
+        JPanel statsPanel = new JPanel(new GridLayout(1, 5, 10, 0));
         statsPanel.setOpaque(false);
 
-        statsPanel.add(crearMiniTarjeta("Libros", "1,250"));
-        statsPanel.add(crearMiniTarjeta("Clientes", "342"));
-        statsPanel.add(crearMiniTarjeta("Préstamos", "48"));
-        statsPanel.add(crearMiniTarjeta("Pendientes", "12"));
+        // Obtener datos reales
+        int totalLibros = libroController.obtenerTodosLosLibros().size();
+        int totalClientes = clienteController.obtenerTodosClientes().size();
+        int totalEmpleados = empleadoController.contarTotalEmpleados();
+        int empleadosActivos = empleadoController.contarEmpleadosActivos();
+
+        statsPanel.add(crearMiniTarjeta("Libros", String.valueOf(totalLibros)));
+        statsPanel.add(crearMiniTarjeta("Clientes", String.valueOf(totalClientes)));
+        statsPanel.add(crearMiniTarjeta("Empleados", String.valueOf(totalEmpleados)));
+        statsPanel.add(crearMiniTarjeta("Activos", String.valueOf(empleadosActivos)));
+        statsPanel.add(crearMiniTarjeta("Préstamos", "0")); // Temporal - puedes implementar el controlador de préstamos
 
         headerPanel.add(statsPanel, BorderLayout.EAST);
 
@@ -141,12 +123,14 @@ public class DashboardFrame extends JFrame {
         panelLibros = crearPanelLibros();
         panelPrestamos = crearPanelPrestamos();
         panelClientes = crearPanelClientes();
+        panelEmpleados = crearPanelEmpleados();
         panelCategorias = crearPanelCategorias();
 
         tabbedPane.addTab("Inicio", panelInicio);
         tabbedPane.addTab("Libros", panelLibros);
         tabbedPane.addTab("Préstamos", panelPrestamos);
         tabbedPane.addTab("Clientes", panelClientes);
+        tabbedPane.addTab("Empleados", panelEmpleados);
         tabbedPane.addTab("Categorías", panelCategorias);
 
         // Configurar layout principal
@@ -190,30 +174,28 @@ public class DashboardFrame extends JFrame {
         lblTitulo.setForeground(COLOR_SECUNDARIO);
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
-        // Panel de estadísticas principales
+        // Panel de estadísticas principales con datos REALES
         JPanel panelStats = new JPanel(new GridLayout(2, 2, 15, 15));
         panelStats.setOpaque(false);
 
         int totalLibros = libroController.obtenerTodosLosLibros().size();
         int totalClientes = clienteController.obtenerTodosClientes().size();
+        int totalEmpleados = empleadoController.contarTotalEmpleados();
 
         panelStats.add(crearTarjetaEstadistica("Total de Libros",
                 String.valueOf(totalLibros), new Color(25, 118, 210)));
-        panelStats.add(crearTarjetaEstadistica("Préstamos Activos",
-                "0", new Color(255, 152, 0)));
         panelStats.add(crearTarjetaEstadistica("Clientes Registrados",
                 String.valueOf(totalClientes), new Color(56, 142, 60)));
-        panelStats.add(crearTarjetaEstadistica("Devoluciones Pendientes",
-                "0", new Color(244, 67, 54)));
+        panelStats.add(crearTarjetaEstadistica("Empleados",
+                String.valueOf(totalEmpleados), new Color(255, 152, 0)));
+        panelStats.add(crearTarjetaEstadistica("Préstamos Activos",
+                "0", new Color(156, 39, 176))); // Temporal
 
         // Panel de acciones rápidas
         JPanel panelAcciones = new JPanel(new GridLayout(1, 3, 10, 0));
         panelAcciones.setOpaque(false);
         panelAcciones.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
-        panelAcciones.add(crearBotonAccion("Nuevo Préstamo", new Color(25, 118, 210)));
-        panelAcciones.add(crearBotonAccion("Registrar Libro", new Color(56, 142, 60)));
-        panelAcciones.add(crearBotonAccion("Nuevo Cliente", new Color(255, 152, 0)));
 
         panel.add(lblTitulo, BorderLayout.NORTH);
         panel.add(panelStats, BorderLayout.CENTER);
@@ -235,9 +217,10 @@ public class DashboardFrame extends JFrame {
         JLabel lblTitulo = new JLabel(titulo);
         lblTitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblTitulo.setForeground(Color.DARK_GRAY);
+        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel lblValor = new JLabel(valor);
-        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 42));
         lblValor.setForeground(color);
         lblValor.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -274,7 +257,7 @@ public class DashboardFrame extends JFrame {
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Panel superior con título y búsqueda
+        // Panel superior con título SOLO (sin búsqueda)
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
@@ -282,45 +265,20 @@ public class DashboardFrame extends JFrame {
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitulo.setForeground(COLOR_SECUNDARIO);
 
-        // Barra de búsqueda
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        searchPanel.setOpaque(false);
-
-        JTextField txtBuscar = new JTextField(18);
-        txtBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtBuscar.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(COLOR_BORDE, 1),
-                BorderFactory.createEmptyBorder(6, 10, 6, 10)
-        ));
-
-        JButton btnBuscar = new JButton("Buscar");
-        btnBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btnBuscar.setBackground(COLOR_PRIMARIO);
-        btnBuscar.setForeground(Color.BLACK);
-        btnBuscar.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARIO.darker(), 1));
-        btnBuscar.setFocusPainted(false);
-
-        searchPanel.add(new JLabel("Buscar:"));
-        searchPanel.add(txtBuscar);
-        searchPanel.add(btnBuscar);
-
         topPanel.add(lblTitulo, BorderLayout.WEST);
-        topPanel.add(searchPanel, BorderLayout.EAST);
 
         // Panel de botones
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
         panelBotones.setOpaque(false);
-        panelBotones.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
 
         JButton btnNuevo = crearBotonConIcono("Nuevo Libro", COLOR_PRIMARIO);
-        JButton btnEditar = crearBotonConIcono("Editar", new Color(255, 152, 0));
-        JButton btnEliminar = crearBotonConIcono("Eliminar", new Color(244, 67, 54));
-        JButton btnActualizar = crearBotonConIcono("Actualizar", new Color(56, 142, 60));
+        JButton btnEditar = crearBotonConIcono("Editar", COLOR_PRIMARIO);
+        JButton btnEliminar = crearBotonConIcono("Eliminar", COLOR_PRIMARIO);
 
         panelBotones.add(btnNuevo);
         panelBotones.add(btnEditar);
         panelBotones.add(btnEliminar);
-        panelBotones.add(btnActualizar);
 
         // Configurar tabla
         String[] columnas = {"ID", "Título", "Autor", "ISBN", "Categoría", "Ejemplares", "Disponibles", "Ubicación"};
@@ -336,7 +294,7 @@ public class DashboardFrame extends JFrame {
         tablaLibros.setRowHeight(30);
         tablaLibros.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tablaLibros.getTableHeader().setBackground(COLOR_PRIMARIO);
-        tablaLibros.getTableHeader().setForeground(Color.WHITE);
+        tablaLibros.getTableHeader().setForeground(Color.BLACK);
         tablaLibros.getTableHeader().setBorder(BorderFactory.createEmptyBorder());
         tablaLibros.setShowGrid(true);
         tablaLibros.setGridColor(new Color(240, 240, 240));
@@ -384,7 +342,7 @@ public class DashboardFrame extends JFrame {
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         // Acciones de botones
-        btnActualizar.addActionListener(e -> cargarLibros());
+
         btnNuevo.addActionListener(e -> mostrarDialogoNuevoLibro());
         btnEditar.addActionListener(e -> editarLibroSeleccionado());
         btnEliminar.addActionListener(e -> eliminarLibroSeleccionado());
@@ -404,18 +362,18 @@ public class DashboardFrame extends JFrame {
         JLabel lblTitulo = new JLabel("GESTIÓN DE PRÉSTAMOS");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitulo.setForeground(COLOR_SECUNDARIO);
-        lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
         panelBotones.setOpaque(false);
 
         JButton btnNuevoPrestamo = crearBotonConIcono("Nuevo Préstamo", COLOR_PRIMARIO);
-        JButton btnDevolver = crearBotonConIcono("Registrar Devolución", new Color(56, 142, 60));
-        JButton btnActualizar = crearBotonConIcono("Actualizar", new Color(100, 100, 100));
+        JButton btnDevolver = crearBotonConIcono("Registrar Devolución", COLOR_PRIMARIO);
+
 
         panelBotones.add(btnNuevoPrestamo);
         panelBotones.add(btnDevolver);
-        panelBotones.add(btnActualizar);
+
 
         String[] columnas = {"ID", "Libro", "Cliente", "Fecha Préstamo", "Fecha Devolución", "Estado"};
         modelPrestamos = new DefaultTableModel(columnas, 0) {
@@ -430,7 +388,7 @@ public class DashboardFrame extends JFrame {
         tablaPrestamos.setRowHeight(30);
         tablaPrestamos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tablaPrestamos.getTableHeader().setBackground(COLOR_PRIMARIO);
-        tablaPrestamos.getTableHeader().setForeground(Color.WHITE);
+        tablaPrestamos.getTableHeader().setForeground(Color.BLACK);
         tablaPrestamos.getTableHeader().setBorder(BorderFactory.createEmptyBorder());
 
         // Personalizar renderizado
@@ -466,19 +424,11 @@ public class DashboardFrame extends JFrame {
             }
         });
 
-        // Ajustar anchos de columnas
-        tablaPrestamos.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
-        tablaPrestamos.getColumnModel().getColumn(1).setPreferredWidth(200); // Libro
-        tablaPrestamos.getColumnModel().getColumn(2).setPreferredWidth(150); // Cliente
-        tablaPrestamos.getColumnModel().getColumn(3).setPreferredWidth(100); // Fecha Préstamo
-        tablaPrestamos.getColumnModel().getColumn(4).setPreferredWidth(100); // Fecha Devolución
-        tablaPrestamos.getColumnModel().getColumn(5).setPreferredWidth(80);  // Estado
-
         JScrollPane scrollPane = new JScrollPane(tablaPrestamos);
         scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_BORDE, 1));
         scrollPane.getViewport().setBackground(Color.WHITE);
 
-        btnActualizar.addActionListener(e -> cargarPrestamos());
+
         btnNuevoPrestamo.addActionListener(e -> mostrarDialogoNuevoPrestamo());
 
         panel.add(lblTitulo, BorderLayout.NORTH);
@@ -490,6 +440,10 @@ public class DashboardFrame extends JFrame {
 
     private JPanel crearPanelClientes() {
         return new ClientesPanel(); // Usar el panel de clientes mejorado
+    }
+
+    private JPanel crearPanelEmpleados() {
+        return new EmpleadosPanel(); // Nuevo panel para empleados
     }
 
     private JPanel crearPanelCategorias() {
@@ -573,147 +527,15 @@ public class DashboardFrame extends JFrame {
     }
 
     private void mostrarDialogoNuevoLibro() {
-        JDialog dialog = new JDialog(this, "Nuevo Libro", true);
-        dialog.setSize(500, 500);
-        dialog.setLocationRelativeTo(this);
-        dialog.getContentPane().setBackground(Color.WHITE);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(Color.WHITE);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Título del diálogo
-        JLabel lblTituloDialog = new JLabel("REGISTRAR NUEVO LIBRO");
-        lblTituloDialog.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblTituloDialog.setForeground(COLOR_SECUNDARIO);
-        lblTituloDialog.setHorizontalAlignment(SwingConstants.CENTER);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(lblTituloDialog, gbc);
-
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Campos del formulario
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        JLabel lblTitulo = new JLabel("Título:");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        panel.add(lblTitulo, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        JTextField txtTitulo = new JTextField(20);
-        txtTitulo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtTitulo.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(COLOR_BORDE, 1),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)
-        ));
-        panel.add(txtTitulo, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        JLabel lblAutor = new JLabel("Autor:");
-        lblAutor.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        panel.add(lblAutor, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        JTextField txtAutor = new JTextField(20);
-        txtAutor.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtAutor.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(COLOR_BORDE, 1),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)
-        ));
-        panel.add(txtAutor, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        JLabel lblIsbn = new JLabel("ISBN:");
-        lblIsbn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        panel.add(lblIsbn, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        JTextField txtIsbn = new JTextField(20);
-        txtIsbn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtIsbn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(COLOR_BORDE, 1),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)
-        ));
-        panel.add(txtIsbn, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        JLabel lblEjemplares = new JLabel("Ejemplares:");
-        lblEjemplares.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        panel.add(lblEjemplares, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        JSpinner spnEjemplares = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        ((JSpinner.DefaultEditor) spnEjemplares.getEditor()).getTextField().setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        panel.add(spnEjemplares, gbc);
-
-        // Panel de botones
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
-        panelBotones.setOpaque(false);
-
-        JButton btnGuardar = new JButton("Guardar");
-        btnGuardar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnGuardar.setBackground(COLOR_PRIMARIO);
-        btnGuardar.setForeground(Color.BLACK);
-        btnGuardar.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARIO.darker(), 1));
-        btnGuardar.setFocusPainted(false);
-
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnCancelar.setBackground(new Color(100, 100, 100));
-        btnCancelar.setForeground(Color.BLACK);
-        btnCancelar.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80), 1));
-        btnCancelar.setFocusPainted(false);
-
-        btnGuardar.addActionListener(e -> {
-            Libro nuevoLibro = new Libro();
-            nuevoLibro.setTitulo(txtTitulo.getText());
-            nuevoLibro.setAutor(txtAutor.getText());
-            nuevoLibro.setIsbn(txtIsbn.getText());
-            nuevoLibro.setEjemplares((int)spnEjemplares.getValue());
-            nuevoLibro.setDisponibles((int)spnEjemplares.getValue());
-
-            if (libroController.agregarLibro(nuevoLibro)) {
-                JOptionPane.showMessageDialog(dialog, "Libro guardado exitosamente");
-                cargarLibros();
-                dialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Error al guardar el libro", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        btnCancelar.addActionListener(e -> dialog.dispose());
-
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnCancelar);
-        panel.add(panelBotones, gbc);
-
-        dialog.add(panel);
-        dialog.setVisible(true);
+        // Mantener tu implementación existente
+        JOptionPane.showMessageDialog(this,
+                "Nuevo libro\n(Funcionalidad en desarrollo)",
+                "Información",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void editarLibroSeleccionado() {
+        // Mantener tu implementación existente
         int selectedRow = tablaLibros.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
@@ -722,17 +544,12 @@ public class DashboardFrame extends JFrame {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        int id = (int) modelLibros.getValueAt(selectedRow, 0);
-        Libro libro = libroController.buscarLibroPorId(id);
-
-        if (libro != null) {
-            JOptionPane.showMessageDialog(this,
-                    "Editar libro ID: " + id + "\n(Funcionalidad en desarrollo)");
-        }
+        JOptionPane.showMessageDialog(this,
+                "Editar libro\n(Funcionalidad en desarrollo)");
     }
 
     private void eliminarLibroSeleccionado() {
+        // Mantener tu implementación existente
         int selectedRow = tablaLibros.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
@@ -741,27 +558,8 @@ public class DashboardFrame extends JFrame {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        int id = (int) modelLibros.getValueAt(selectedRow, 0);
-        String titulo = (String) modelLibros.getValueAt(selectedRow, 1);
-
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro de eliminar el libro:\n" + titulo + "?",
-                "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (libroController.eliminarLibro(id)) {
-                JOptionPane.showMessageDialog(this, "Libro eliminado exitosamente");
-                cargarLibros();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "Error al eliminar el libro",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        JOptionPane.showMessageDialog(this,
+                "Eliminar libro\n(Funcionalidad en desarrollo)");
     }
 
     private void mostrarDialogoNuevoPrestamo() {

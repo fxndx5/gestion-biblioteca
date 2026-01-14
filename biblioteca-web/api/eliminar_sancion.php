@@ -1,18 +1,38 @@
 <?php
-// archivo: ajax/eliminar_sancion.php
 session_start();
 
-// Verificar que el usuario está autenticado
+// Debug: Ver qué hay en la sesión
+error_log("=== ELIMINAR SANCION DEBUG ===");
+error_log("Session ID: " . session_id());
+error_log("Usuario ID: " . ($_SESSION['usuario_id'] ?? 'NO DEFINIDO'));
+error_log("Usuario Cargo: " . ($_SESSION['usuario_cargo'] ?? 'NO DEFINIDO'));
+error_log("==============================");
+
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'No autorizado']);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'No autorizado - No hay sesión activa'
+    ]);
     exit();
 }
 
 // VERIFICAR QUE EL USUARIO ES ADMIN
-if (!isset($_SESSION['cargo']) || $_SESSION['cargo'] !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Acceso denegado. Solo administradores pueden eliminar sanciones.']);
+if (!isset($_SESSION['usuario_cargo'])) {
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Error: No se ha definido el cargo en la sesión. Por favor, cierra sesión y vuelve a entrar.',
+        'debug' => 'usuario_cargo no está definido en SESSION'
+    ]);
+    exit();
+}
+
+if ($_SESSION['usuario_cargo'] !== 'admin') {
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Acceso denegado. Solo administradores pueden eliminar sanciones.',
+        'debug' => 'Cargo actual: ' . $_SESSION['usuario_cargo'] . ' (se esperaba: admin)'
+    ]);
     exit();
 }
 
@@ -64,13 +84,13 @@ $stmt->bind_param("i", $id_cliente);
 if ($stmt->execute()) {
     echo json_encode([
         'success' => true,
-        'message' => "✓ Sanción eliminada correctamente para {$cliente['nombre']} (DNI: {$cliente['dni']})",
+        'message' => "Sanción eliminada correctamente para {$cliente['nombre']} (DNI: {$cliente['dni']})",
         'cliente' => $cliente['nombre']
     ]);
 } else {
     echo json_encode([
         'success' => false,
-        'message' => 'Error al eliminar la sanción'
+        'message' => 'Error al eliminar la sanción: ' . $stmt->error
     ]);
 }
 

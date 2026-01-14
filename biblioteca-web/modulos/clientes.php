@@ -111,7 +111,7 @@ $result_clientes = $conn->query($sql_clientes);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Clientes - Biblioteca</title>
     <link rel="stylesheet" href="../css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard">
@@ -247,11 +247,11 @@ $result_clientes = $conn->query($sql_clientes);
                                     <td><?php echo date('d/m/Y', strtotime($cliente['fecha_registro'])); ?></td>
                                     <td>
                                         <?php if ($cliente['sancionado']): ?>
-                                            <span class="badge badge-danger"><i class="fas fa-ban"></i> Sancionado</span>
+                                            <span class="badge badge-danger">Sancionado</span>
                                         <?php elseif ($prestamos_activos > 0): ?>
-                                            <span class="badge badge-warning"><i class="fas fa-book"></i> Con préstamos</span>
+                                            <span class="badge badge-warning"> Con préstamos</span>
                                         <?php else: ?>
-                                            <span class="badge badge-success"><i class="fas fa-check"></i> Activo</span>
+                                            <span class="badge badge-success">Activo</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>

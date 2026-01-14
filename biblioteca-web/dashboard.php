@@ -8,7 +8,7 @@ if (!isset($_SESSION['usuario_id'])) {
 require_once 'includes/conexion.php';
 
 function esAdministrador() {
-    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'administrador';
+    return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'admin';
 }
 
 function esEmpleado() {
@@ -23,7 +23,7 @@ $top_libros = [];
 
 // SOLO para admin: obtener estadísticas avanzadas
 if (esAdministrador()) {
-    // activos vs sancionados
+    // contadores de clientes sancionados y activos
     $sql_clientes = "SELECT 
         COUNT(*) as total_clientes,
         SUM(CASE WHEN sancionado = 1 THEN 1 ELSE 0 END) as clientes_sancionados,
@@ -140,6 +140,99 @@ if (!esAdministrador()) {
     <title>Dashboard - Biblioteca</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+
+function abrirModalEliminarSancion() {
+    console.log('Abriendo modal...');
+    const modal = document.getElementById('modalEliminarSancion');
+    if (modal) {
+        modal.classList.add('show');
+        setTimeout(() => {
+            const input = document.getElementById('buscarSancion');
+            if (input) input.focus();
+        }, 100);
+    } else {
+        alert('Modal no encontrado. Recarga la página.');
+    }
+}
+
+function buscarSancionActiva(texto) {
+    if (texto.length < 2) {
+        document.getElementById('resultadosSancion').innerHTML = '';
+        return;
+    }
+    
+    fetch(`api/buscar_cliente.php?q=${encodeURIComponent(texto)}`)
+        .then(response => response.json())
+        .then(clientes => {
+            const container = document.getElementById('resultadosSancion');
+            const sancionados = clientes.filter(c => c.sancionado == 0);
+            
+            if (sancionados.length === 0) {
+                container.innerHTML = '<p class="text-muted" style="padding: 10px;">No se encontraron clientes sancionados</p>';
+                return;
+            }
+            
+            container.innerHTML = sancionados.map(cliente => `
+                <div class="search-result-item" onclick="seleccionarSancion(${cliente.id}, '${cliente.nombre.replace(/'/g, "\\'")}', '${cliente.dni}')">
+                    <div class="result-info">
+                        <strong>${cliente.nombre}</strong>
+                        <small>DNI: ${cliente.dni}</small><br>
+                        <span class="badge badge-danger">Sancionado</span>
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function seleccionarSancion(id, nombre, dni) {
+    document.getElementById('sancionSeleccionada').value = id;
+    document.getElementById('buscarSancion').value = `${nombre} (${dni})`;
+    document.getElementById('resultadosSancion').innerHTML = '';
+}
+
+function eliminarSancion() {
+    const idCliente = document.getElementById('sancionSeleccionada').value;
+    const razon = document.getElementById('razonEliminacion').value;
+    
+    if (!idCliente) {
+        alert('Por favor, selecciona un cliente');
+        return;
+    }
+    
+    if (!razon.trim()) {
+        alert('Por favor, indica el motivo de la reactivación');
+        return;
+    }
+    
+    if (!confirm('¿Estás seguro de querer reactivar este cliente?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('id_cliente', idCliente);
+    
+    fetch('api/eliminar_sancion.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('modalEliminarSancion').classList.remove('show');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al eliminar la sanción');
+    });
+}
+</script>
 </head>
 <body>
     <div class="dashboard">
@@ -215,7 +308,20 @@ if (!esAdministrador()) {
             <div class="admin-section">
                 <h2>Estadísticas Avanzadas (Solo Administrador)</h2>
                 
-                <!-- Estadísticas detalladas de clientes -->
+                <!-- BOTONES SOLO PARA ADMIN -->
+                <div class="prestamos-actions" style="margin-bottom: 30px;">
+                    <button class="btn btn-primary" onclick="abrirModalNuevoPrestamo()">
+                        Nuevo Préstamo
+                    </button>
+                    <button class="btn btn-success" onclick="abrirModalDevolucion()">
+                        Registrar Devolución
+                    </button>
+                    <button class="btn btn-warning" onclick="abrirModalEliminarSancion()">
+                        Eliminar Sanción
+                    </button>
+                </div>
+                
+                <!-- Estadisticas detalladas de clientes -->
                 <div class="stats-grid-advanced">
                     <div class="stat-card-advanced">
                         <h4></i> Clientes</h4>
@@ -298,55 +404,7 @@ if (!esAdministrador()) {
                     </div>
                 </div>
                 
-                <!-- Tabla de libros por categoría -->
-                <h3>Libros por Categoría</h3>
-                <table class="category-table">
-                    <thead>
-                        <tr>
-                            <th>Categoría</th>
-                            <th>Total Libros</th>
-                            <th>Ejemplares</th>
-                            <th>Disponibles</th>
-                            <th>Prestados</th>
-                            <th>% Disponibilidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($categorias_stats)): ?>
-                            <?php foreach ($categorias_stats as $categoria): ?>
-                            <tr>
-                                <td><strong><?php echo htmlspecialchars($categoria['categoria']); ?></strong></td>
-                                <td><?php echo $categoria['cantidad_libros']; ?></td>
-                                <td><?php echo $categoria['total_ejemplares']; ?></td>
-                                <td>
-                                    <span class="status-available">
-                                        <?php echo $categoria['disponibles']; ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="status-borrowed">
-                                        <?php echo $categoria['prestados']; ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php if ($categoria['total_ejemplares'] > 0): ?>
-                                        <?php echo round(($categoria['disponibles'] / $categoria['total_ejemplares']) * 100, 1); ?>%
-                                        <div class="category-progress">
-                                            <div class="category-progress-bar" style="width: <?php echo ($categoria['disponibles'] / $categoria['total_ejemplares']) * 100; ?>%"></div>
-                                        </div>
-                                    <?php else: ?>
-                                        0%
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="6" class="text-center">No hay categorías registradas</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                
                 
                 <!-- Top 5 libros más prestados -->
                 <h3>Top 5 Libros Más Prestados</h3>
@@ -392,16 +450,19 @@ if (!esAdministrador()) {
             <?php endif; ?>
 
             <div class="section prestamos-rapidos">
-                <h2>Gestión Rápida de Préstamos</h2>
-                
-                <div class="prestamos-actions">
-                    <button class="btn btn-primary" onclick="abrirModalNuevoPrestamo()">
-                        Nuevo Préstamo
-                    </button>
-                    <button class="btn btn-success" onclick="abrirModalDevolucion()">
-                        Registrar Devolución
-                    </button>
-                </div>
+            <h2>Gestión Rápida de Préstamos</h2>
+            
+            <?php if (!esAdministrador()): ?>
+            <!-- BOTONES SOLO PARA EMPLEADOS (NO ADMIN) -->
+            <div class="prestamos-actions">
+                <button class="btn btn-primary" onclick="abrirModalNuevoPrestamo()">
+                    Nuevo Préstamo
+                </button>
+                <button class="btn btn-success" onclick="abrirModalDevolucion()">
+                    Registrar Devolución
+                </button>
+            </div>
+            <?php endif; ?>
 
                 <h3 style="margin-top: 30px;">Préstamos Activos Pendientes de Devolución</h3>
                 <div class="table-responsive">
@@ -621,10 +682,11 @@ if (!esAdministrador()) {
                 </div>
             </div>
             <!-- ===== MODAL ELIMINAR SANCIÓN ===== -->
+            <?php if (esAdministrador()): ?>
             <div id="modalEliminarSancion" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-user-check"></i> Eliminar Sanción</h3>
+                        <h3> Eliminar Sanción</h3>
                         <button class="btn-close" onclick="cerrarModal('modalEliminarSancion')">&times;</button>
                     </div>
                     
@@ -702,7 +764,7 @@ if (!esAdministrador()) {
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalEliminarSliminarSancion')">
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalEliminarSancion')">
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-success">
@@ -712,12 +774,12 @@ if (!esAdministrador()) {
                     </form>
                 </div>
             </div>
+            <?php endif; ?>
 
             <style>
             /* Estilos específicos para la gestión de préstamos */
             .prestamos-rapidos {
                 background: linear-gradient(135deg, #667eea15, #764ba215);
-                border-left: 4px solid #667eea;
             }
 
             .prestamos-actions {
@@ -781,7 +843,7 @@ if (!esAdministrador()) {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                background: linear-gradient(135deg, #667eea, #764ba2);
+                background: var(--dark-blue);
                 color: white;
                 border-radius: 16px 16px 0 0;
             }
@@ -1110,7 +1172,6 @@ if (!esAdministrador()) {
                 document.getElementById('resultadosPrestamo').innerHTML = '';
             }
 
-            // Registrar Préstamo
             async function registrarPrestamo() {
                 const formData = new FormData(document.getElementById('formNuevoPrestamo'));
                 const alerta = document.getElementById('alertaPrestamo');
@@ -1137,7 +1198,6 @@ if (!esAdministrador()) {
                 }
             }
 
-            // Registrar Devolución
             async function registrarDevolucion() {
                 const formData = new FormData(document.getElementById('formDevolucion'));
                 const alerta = document.getElementById('alertaDevolucion');
@@ -1164,7 +1224,6 @@ if (!esAdministrador()) {
                 }
             }
 
-            // Devolución rápida desde la tabla
             function devolverLibro(idPrestamo, titulo, cliente) {
                 if (confirm(`¿Confirmar devolución?\n\nLibro: ${titulo}\nCliente: ${cliente}`)) {
                     fetch('api/registrar_devolucion.php', {

@@ -237,16 +237,70 @@ function mostrarMensaje(tipo, texto) {
     }, 5000);
 }
 
-// ===== FUNCIONES PARA ELIMINAR SANCIÓN =====
+// ===== FUNCIÓN PARA ELIMINAR SANCIÓN =====
+function abrirModalEliminarSancion() {
+    const modal = document.getElementById('modalEliminarSancion');
+    if (modal) {
+        modal.classList.add('show');
+        document.getElementById('buscarSancion').focus();
+    }
+}
 
-// Función para eliminar sanción (solo admin)
-function eliminarSancion(idCliente, nombreCliente) {
-    if (!confirm(`¿Estás seguro de que deseas eliminar la sanción de ${nombreCliente}?`)) {
+function buscarSancionActiva(texto) {
+    if (texto.length < 2) {
+        document.getElementById('resultadosSancion').innerHTML = '';
+        return;
+    }
+    
+    fetch(`api/buscar_cliente.php?q=${encodeURIComponent(texto)}`)
+        .then(response => response.json())
+        .then(clientes => {
+            const container = document.getElementById('resultadosSancion');
+            
+            // Filtrar solo clientes sancionados
+            const sancionados = clientes.filter(c => c.sancionado == 0);
+            
+            if (sancionados.length === 0) {
+                container.innerHTML = '<p class="text-muted" style="padding: 10px;">No se encontraron clientes sancionados</p>';
+                return;
+            }
+            
+            container.innerHTML = sancionados.map(cliente => `
+                <div class="search-result-item" onclick="seleccionarSancion(${cliente.id}, '${cliente.nombre}', '${cliente.dni}')">
+                    <div class="result-info">
+                        <strong>${cliente.nombre}</strong>
+                        <small>DNI: ${cliente.dni}</small><br>
+                        <span class="badge badge-danger">Sancionado</span>
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function seleccionarSancion(id, nombre, dni) {
+    document.getElementById('sancionSeleccionada').value = id;
+    document.getElementById('buscarSancion').value = `${nombre} (${dni})`;
+    document.getElementById('resultadosSancion').innerHTML = '';
+}
+
+function eliminarSancion() {
+    const idCliente = document.getElementById('sancionSeleccionada').value;
+    const razon = document.getElementById('razonEliminacion').value;
+    
+    if (!idCliente) {
+        alert('Por favor, selecciona un cliente');
+        return;
+    }
+    
+    if (!razon.trim()) {
+        alert('Por favor, indica el motivo de la reactivación');
         return;
     }
     
     const formData = new FormData();
     formData.append('id_cliente', idCliente);
+    formData.append('razon', razon);
     
     fetch('api/eliminar_sancion.php', {
         method: 'POST',
@@ -255,58 +309,16 @@ function eliminarSancion(idCliente, nombreCliente) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            mostrarAlerta(data.message, 'success');
-            // Recargar la tabla de clientes
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
+            alert(data.message);
+            cerrarModal('modalEliminarSancion');
+            location.reload();
         } else {
-            mostrarAlerta(data.message, 'error');
+            alert(data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        mostrarAlerta('Error al eliminar la sanción', 'error');
-    });
-}
-
-// Función para abrir modal de sanción
-function abrirModalSancion(idCliente, nombreCliente) {
-    const dias = prompt(`¿Cuántos días deseas sancionar a ${nombreCliente}?`, '15');
-    
-    if (dias === null) return; // Usuario canceló
-    
-    if (!dias || isNaN(dias) || dias < 1 || dias > 365) {
-        alert('Por favor ingresa un número válido de días entre 1 y 365');
-        return;
-    }
-    
-    const motivo = prompt('Motivo de la sanción (opcional):', 'Préstamo no devuelto a tiempo');
-    
-    const formData = new FormData();
-    formData.append('id_cliente', idCliente);
-    formData.append('dias_sancion', dias);
-    formData.append('motivo', motivo || 'Sanción aplicada por administrador');
-    
-    fetch('api/aplicar_sancion.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            mostrarAlerta(data.message, 'success');
-            // Recargar la tabla de clientes
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        } else {
-            mostrarAlerta(data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarAlerta('Error al aplicar la sanción', 'error');
+        alert('Error al eliminar la sanción');
     });
 }
 

@@ -295,7 +295,6 @@ body {
 /* ===== ADMIN SECTION ===== */
 .admin-section {
     background: var(--bg-light);
-    border-left: 4px solid var(--primary-blue);
     padding: 25px;
     margin: 20px 0;
     border-radius: 0 12px 12px 0;

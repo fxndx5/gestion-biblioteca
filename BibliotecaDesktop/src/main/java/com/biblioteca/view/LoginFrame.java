@@ -198,17 +198,6 @@ public class LoginFrame extends JFrame {
         });
         formPanel.add(btnLogin, gbcForm);
 
-        // Enlace para recuperar contraseña
-        gbcForm.gridx = 0;
-        gbcForm.gridy = 6;
-        gbcForm.gridwidth = 2;
-        JLabel lblRecuperar = new JLabel("<html><u>¿Olvidó su contraseña?</u></html>");
-        lblRecuperar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblRecuperar.setForeground(COLOR_TEXTO_MEDIO); // Color gris medio
-        lblRecuperar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        lblRecuperar.setHorizontalAlignment(SwingConstants.CENTER);
-        formPanel.add(lblRecuperar, gbcForm);
-
         // Layout para el panel derecho
         gbc.gridx = 0;
         gbc.gridy = 0;
