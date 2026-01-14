@@ -1,12 +1,6 @@
 <?php
 session_start();
 
-// Debug: Ver qué hay en la sesión
-error_log("=== ELIMINAR SANCION DEBUG ===");
-error_log("Session ID: " . session_id());
-error_log("Usuario ID: " . ($_SESSION['usuario_id'] ?? 'NO DEFINIDO'));
-error_log("Usuario Cargo: " . ($_SESSION['usuario_cargo'] ?? 'NO DEFINIDO'));
-error_log("==============================");
 
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
@@ -17,7 +11,6 @@ if (!isset($_SESSION['usuario_id'])) {
     exit();
 }
 
-// VERIFICAR QUE EL USUARIO ES ADMIN
 if (!isset($_SESSION['usuario_cargo'])) {
     echo json_encode([
         'success' => false, 
@@ -50,7 +43,6 @@ if (!$id_cliente) {
     exit();
 }
 
-// Verificar que el cliente existe
 $sql_verificar = "SELECT id, nombre, dni, sancionado FROM clientes WHERE id = ?";
 $stmt = $conn->prepare($sql_verificar);
 $stmt->bind_param("i", $id_cliente);
@@ -63,7 +55,6 @@ if (!$cliente) {
     exit();
 }
 
-// Verificar si ya está activo
 if ($cliente['sancionado'] == 1) {
     echo json_encode([
         'success' => false, 
@@ -72,7 +63,7 @@ if ($cliente['sancionado'] == 1) {
     exit();
 }
 
-// Eliminar la sanción
+// Elimina la sanción
 $sql_eliminar = "UPDATE clientes 
                  SET sancionado = 1, 
                      fecha_fin_sancion = NULL 

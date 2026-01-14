@@ -147,7 +147,7 @@ function registrarPrestamo() {
     const fechaDevolucion = document.getElementById('fechaDevolucion').value;
     const observaciones = document.getElementById('observaciones').value;
     
-    // Validar que se haya seleccionado cliente y libro
+    //valida si es cliente, que hay libro y la fechita
     if (!idCliente) {
         mostrarAlerta('Por favor, selecciona un cliente', 'error');
         return;
@@ -163,7 +163,7 @@ function registrarPrestamo() {
         return;
     }
     
-    // Crear FormData
+    //crea FormData para crear clave valor para busqueda easy en api
     const formData = new FormData();
     formData.append('id_cliente', idCliente);
     formData.append('id_libro', idLibro);
@@ -188,7 +188,6 @@ function registrarPrestamo() {
             
             setTimeout(() => {
                 cerrarModal('modalNuevoPrestamo');
-                // Recargar la tabla de préstamos si existe
                 if (typeof cargarPrestamos === 'function') {
                     cargarPrestamos();
                 }
@@ -257,7 +256,6 @@ function buscarSancionActiva(texto) {
         .then(clientes => {
             const container = document.getElementById('resultadosSancion');
             
-            // Filtrar solo clientes sancionados
             const sancionados = clientes.filter(c => c.sancionado == 0);
             
             if (sancionados.length === 0) {

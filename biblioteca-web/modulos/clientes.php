@@ -7,7 +7,6 @@ if (!isset($_SESSION['usuario_id'])) {
 
 require_once '../includes/conexion.php';
 
-// Función para verificar permisos
 function esAdministrador() {
     return isset($_SESSION['usuario_cargo']) && $_SESSION['usuario_cargo'] === 'administrador';
 }
@@ -17,7 +16,6 @@ function esEmpleado() {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_cliente'])) {
-    // Verificar permisos: admin y empleados pueden crear clientes
     if (!esAdministrador() && !esEmpleado()) {
         $_SESSION['error_message'] = 'No tiene permisos para crear clientes';
         header('Location: clientes.php');
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_cliente'])) {
     $telefono = trim($_POST['telefono']);
     $direccion = trim($_POST['direccion']);
 
-    // Validar DNI único
     $sql_check = "SELECT id FROM clientes WHERE dni = ?";
     $stmt_check = $conn->prepare($sql_check);
     $stmt_check->bind_param("s", $dni);

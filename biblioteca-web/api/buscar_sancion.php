@@ -14,7 +14,6 @@ if (empty($query)) {
     exit();
 }
 
-// Buscar clientes sancionados por DNI, nombre o ID
 $sql = "SELECT id, dni, nombre, email, telefono, 
                DATE_FORMAT(fecha_registro, '%d/%m/%Y') as fecha_registro,
                sancionado,

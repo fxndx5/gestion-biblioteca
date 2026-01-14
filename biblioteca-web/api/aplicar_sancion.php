@@ -1,15 +1,12 @@
 <?php
-// archivo: ajax/aplicar_sancion.php
 session_start();
 
-// Verificar que el usuario está autenticado
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'No autorizado']);
     exit();
 }
 
-// VERIFICAR QUE EL USUARIO ES ADMIN
 if (!isset($_SESSION['cargo']) || $_SESSION['cargo'] !== 'admin') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Acceso denegado. Solo administradores pueden aplicar sanciones.']);
@@ -24,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $id_cliente = $_POST['id_cliente'] ?? null;
-$dias_sancion = $_POST['dias_sancion'] ?? 15; // Por defecto 15 días
+$dias_sancion = $_POST['dias_sancion'] ?? 15; 
 $motivo = $_POST['motivo'] ?? 'Sanción aplicada por administrador';
 
 if (!$id_cliente) {
@@ -32,13 +29,11 @@ if (!$id_cliente) {
     exit();
 }
 
-// Validar días de sanción
 if (!is_numeric($dias_sancion) || $dias_sancion < 1 || $dias_sancion > 365) {
     echo json_encode(['success' => false, 'message' => 'Los días de sanción deben estar entre 1 y 365']);
     exit();
 }
 
-// Verificar que el cliente existe
 $sql_verificar = "SELECT id, nombre, dni, sancionado FROM clientes WHERE id = ?";
 $stmt = $conn->prepare($sql_verificar);
 $stmt->bind_param("i", $id_cliente);
@@ -51,7 +46,6 @@ if (!$cliente) {
     exit();
 }
 
-// Verificar si ya está sancionado
 if ($cliente['sancionado'] == 0) {
     echo json_encode([
         'success' => false, 
@@ -60,10 +54,8 @@ if ($cliente['sancionado'] == 0) {
     exit();
 }
 
-// Calcular fecha de fin de sanción
 $fecha_fin = date('Y-m-d', strtotime("+{$dias_sancion} days"));
 
-// Aplicar la sanción
 $sql_sancionar = "UPDATE clientes 
                   SET sancionado = 0, 
                       fecha_fin_sancion = ? 

@@ -59,7 +59,7 @@ try {
         throw new Exception('Error al registrar la devolución');
     }
     
-    // Incrementa disponibilidad del libro
+    //incrementa disponibilidad del libro
     $sql_update_libro = "UPDATE libros SET disponibles = disponibles + 1 WHERE id = ?";
     $stmt = $conn->prepare($sql_update_libro);
     $stmt->bind_param("i", $prestamo['id_libro']);
@@ -68,7 +68,7 @@ try {
         throw new Exception('Error al actualizar disponibilidad del libro');
     }
     
-    // Verifica si el prestamo se entregó con retraso
+    //verificasi el prestamo se entrego con retraso
     $fecha_dev_estimada = new DateTime($prestamo['fecha_devolucion_estimada']);
     $fecha_actual = new DateTime();
     $dias_retraso = $fecha_actual->diff($fecha_dev_estimada)->days;
